@@ -59,7 +59,7 @@ def create_superpixel(image, image_name):
         image_with_boundaries = img_as_ubyte(image_with_boundaries)
         io.imsave("data/" + image_name + "_SLICO/" + str(number_of_iterations) +"_SLICO.jpg", image_with_boundaries)
     
-    labels = slic(image, n_segments=amount, max_iter=200, enforce_connectivity=True,  slic_zero=False,start_label=1)
+    labels = slic(image, max_iter=200, enforce_connectivity=True,  slic_zero=True,start_label=1)
     rag = rag_mean_color(image, labels)
     final_labels = cut_threshold(labels, rag,25)
     final_label_average = color.label2rgb(final_labels, image, kind='avg', bg_label=0)
