@@ -28,7 +28,8 @@ def get_image(file_path):
         print("File is not a valid picture") 
     
     image = img_as_ubyte(img)
-
+    #image = 255 - image #if image has to be inverted
+    
     return image
     
 def create_superpixel(image, image_name):
@@ -61,7 +62,7 @@ def create_superpixel(image, image_name):
     
     labels = slic(image, max_iter=200, enforce_connectivity=True,  slic_zero=True,start_label=1)
     rag = rag_mean_color(image, labels)
-    final_labels = cut_threshold(labels, rag,25)
+    final_labels = cut_threshold(labels, rag,20)
     final_label_average = color.label2rgb(final_labels, image, kind='avg', bg_label=0)
     image_with_boundaries = mark_boundaries(image, labels, (0, 0, 0))
 
@@ -94,8 +95,8 @@ def post_processing(Image,image_name):
     #Image = 255-Image  
     #Image = cv2.morphologyEx(Image, cv2.MORPH_OPEN, kernel) # use for cleaning noises
     #Image = cv2.morphologyEx(Image, cv2.MORPH_CLOSE, kernel) # use for cleaning noises
-    #Image = remove_small_objects(Image, min_size= 10000) # use if object has bigger noise (e.g. hole)
-    binary = cv2.threshold(Image, 100, 255, cv2.THRESH_BINARY)[1]
+    
+    binary = cv2.threshold(Image, 80, 255, cv2.THRESH_BINARY)[1]
     binary_bitwise = 255-binary #if image has to be inverted
 
     plt.subplot(1, 2, 2), plt.imshow(binary_bitwise, cmap='gray'), plt.title('Result-bitwise'), plt.axis("off")
@@ -114,7 +115,7 @@ def main(file_path):
     file_path: name of an image if in the same directory or path to the image
 
     """
-    image_name = file_path.split(".")[0]
+    image_name = os.path.basename(file_path).split(".")[0]
     image = get_image(file_path)
     segmented = create_superpixel(image, image_name)
     post_processing(segmented,image_name)
@@ -124,6 +125,5 @@ def main(file_path):
 
 if __name__ == '__main__':
 
-    main("01_1.jpg")
-    #main(argv[1])
-
+    main(argv[1])
+    

@@ -4,9 +4,9 @@ import numpy as np
 from sys import argv
 from matplotlib import pyplot as plt
 from skimage.segmentation import slic,mark_boundaries
+from skimage.morphology import remove_small_objects
 from skimage import color, io, img_as_ubyte
 from skimage.future.graph import rag_mean_color, cut_threshold
-
 
 
 def get_image(file_path):
@@ -29,13 +29,14 @@ def get_image(file_path):
         print("File is not a valid picture") 
     
     image = img_as_ubyte(img)
-
+    #image = 255 - image #if image has to be inverted
+    
     return image
     
 def create_superpixel(image,amount,image_name):
     """
     
-    Creates superpixels of the specified number from the given photo.
+    Creates superpixels of the specified number from the given image.
     Saves series of images with labels 
 
     Parameters
@@ -63,7 +64,7 @@ def create_superpixel(image,amount,image_name):
     
     labels = slic(image, n_segments=amount, max_iter=200, enforce_connectivity=True,  slic_zero=False,start_label=1)
     rag = rag_mean_color(image, labels)
-    final_labels = cut_threshold(labels, rag,25)
+    final_labels = cut_threshold(labels, rag,20)
     final_label_average = color.label2rgb(final_labels, image, kind='avg', bg_label=0)
     image_with_boundaries = mark_boundaries(image, labels, (0, 0, 0))
 
@@ -92,18 +93,18 @@ def post_processing(Image,image_name):
 
     """
 
-    kernel = np.ones((7,7), dtype='uint8') 
-    #Image = 255-Image  
+    kernel = np.ones((3,3), dtype='uint8')  
     #Image = cv2.morphologyEx(Image, cv2.MORPH_OPEN, kernel) # use for cleaning noises
     #Image = cv2.morphologyEx(Image, cv2.MORPH_CLOSE, kernel) # use for cleaning noises
-    #Image = remove_small_objects(Image, min_size= 10000) # use if object has bigger noise (e.g. hole)
-    binary = cv2.threshold(Image, 100, 255, cv2.THRESH_BINARY)[1]
+    
+    binary = cv2.threshold(Image,80, 255, cv2.THRESH_BINARY)[1]
     binary_bitwise = 255-binary #if image has to be inverted
-
+    
     plt.subplot(1, 2, 2), plt.imshow(binary_bitwise, cmap='gray'), plt.title('Result-bitwise'), plt.axis("off")
     plt.subplot(1, 2, 1), plt.imshow(binary, cmap='gray'), plt.title('Result'), plt.axis("off")
     io.imsave("data/" + image_name + "_SLIC/" + image_name +"_final2.jpg", binary)
     plt.show()
+    
 
 def main(file_path,amount_superpixel):
     
@@ -117,7 +118,7 @@ def main(file_path,amount_superpixel):
     amount_superpixel : number of desired superpixels
 
     """
-    image_name = file_path.split(".")[0]
+    image_name = os.path.basename(file_path).split(".")[0]
     image = get_image(file_path)
     segmented = create_superpixel(image, amount_superpixel, image_name)
     post_processing(segmented,image_name)
@@ -126,7 +127,6 @@ def main(file_path,amount_superpixel):
     
 
 if __name__ == '__main__':
-
-    main("01_1.jpg", 100)
-    #main(argv[1],int(argv[2]))
+    
+    main(argv[1],int(argv[2]))
 
