@@ -18,7 +18,7 @@ def get_image(file_path):
 
     """
     try:
-        img = cv2.imread(file_path,0)
+        img = cv2.imread(file_path, 0)
         
     except:
         print("File is not a valid picture")
@@ -46,10 +46,10 @@ def dice(segmented, true):
         if (true[i] == 1) and (segmented[i] == 1) :
             intersection += 1
         if true[i] == 1:
-            true_score +=1
+            true_score += 1
         if segmented[i] == 1:
-            segmented_score +=1
-    return np.round((2*intersection)/(true_score+ segmented_score),2)
+            segmented_score += 1
+    return np.round((2 * intersection) / (true_score + segmented_score), 2)
     
 
     
@@ -58,5 +58,5 @@ if __name__ == '__main__':
     true = get_image(argv[1])
     segmented = get_image(argv[2])
     
-    print("Wskaźnik Jaccard'a wynosi: ", np.round(jaccard_score(true,segmented),2))
-    print("Wskaźnik Dice'a wynosi: ", dice(true,segmented))
+    print("Wskaźnik Jaccard'a wynosi: ", np.round(jaccard_score(true, segmented), 2))
+    print("Wskaźnik Dice'a wynosi: ", dice(true, segmented))

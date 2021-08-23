@@ -50,32 +50,32 @@ def create_superpixel(image, image_name):
     """
 
     path = os.path.join(os.getcwd())
-    os.makedirs(os.path.join(path, "data/" + image_name + "_SLICO"), exist_ok=True)
-    number_of_iterations = 1
+    os.makedirs(os.path.join(path, "data/" + image_name + "_SLICO"), exist_ok = True)
+    number_of_iterations = 5
 
     for i in range(1,4):
-        number_of_iterations = number_of_iterations*i
-        labels = slic(image, max_iter=number_of_iterations, enforce_connectivity=True,  slic_zero=True,start_label=1)
+        number_of_iterations = number_of_iterations * i
+        labels = slic(image, max_iter = number_of_iterations, enforce_connectivity = True,  slic_zero = True, start_label = 1)
         image_with_boundaries = mark_boundaries(image, labels, (0, 0, 0))
         image_with_boundaries = img_as_ubyte(image_with_boundaries)
-        io.imsave("data/" + image_name + "_SLICO/" + str(number_of_iterations) +"_SLICO.jpg", image_with_boundaries)
+        io.imsave("data/" + image_name + "_SLICO/" + str(number_of_iterations) + "_SLICO.jpg", image_with_boundaries)
     
-    labels = slic(image, max_iter=200, enforce_connectivity=True,  slic_zero=True,start_label=1)
+    labels = slic(image, max_iter = 200, enforce_connectivity = True,  slic_zero = True, start_label = 1)
     rag = rag_mean_color(image, labels)
-    final_labels = cut_threshold(labels, rag,20)
+    final_labels = cut_threshold(labels, rag, 20)
     final_label_average = color.label2rgb(final_labels, image, kind='avg', bg_label=0)
     image_with_boundaries = mark_boundaries(image, labels, (0, 0, 0))
 
     plt.figure()
-    plt.imshow(image_with_boundaries, cmap='gray'), plt.axis('off')
+    plt.imshow(image_with_boundaries, cmap = 'gray'), plt.axis('off')
     plt.show()
 
-    io.imsave("data/" + image_name + "_SLICO/" + image_name +"_final.jpg", final_label_average)
-    io.imsave("data/" + image_name + "_SLICO/" +"200_SLICO.jpg", image_with_boundaries)
+    io.imsave("data/" + image_name + "_SLICO/" + image_name + "_final.jpg", final_label_average)
+    io.imsave("data/" + image_name + "_SLICO/" + "200_SLICO.jpg", image_with_boundaries)
     return final_label_average
     
 
-def post_processing(Image,image_name):
+def post_processing(Image, image_name):
     """
     
     Creates binary image from given image in grayscale. 
@@ -91,17 +91,17 @@ def post_processing(Image,image_name):
 
     """
 
-    kernel = np.ones((7,7), dtype='uint8') 
-    #Image = 255-Image  
+    kernel = np.ones((7,7), dtype = 'uint8') 
+  
     #Image = cv2.morphologyEx(Image, cv2.MORPH_OPEN, kernel) # use for cleaning noises
     #Image = cv2.morphologyEx(Image, cv2.MORPH_CLOSE, kernel) # use for cleaning noises
     
     binary = cv2.threshold(Image, 80, 255, cv2.THRESH_BINARY)[1]
-    binary_bitwise = 255-binary #if image has to be inverted
+    binary_bitwise = 255 - binary #if image has to be inverted
 
-    plt.subplot(1, 2, 2), plt.imshow(binary_bitwise, cmap='gray'), plt.title('Result-bitwise'), plt.axis("off")
-    plt.subplot(1, 2, 1), plt.imshow(binary, cmap='gray'), plt.title('Result'), plt.axis("off")
-    io.imsave("data/" + image_name + "_SLICO/" + image_name +"_final2.jpg", binary)
+    plt.subplot(1, 2, 2), plt.imshow(binary_bitwise, cmap = 'gray'), plt.title('Result-bitwise'), plt.axis("off")
+    plt.subplot(1, 2, 1), plt.imshow(binary, cmap = 'gray'), plt.title('Result'), plt.axis("off")
+    io.imsave("data/" + image_name + "_SLICO/" + image_name + "_final2.jpg", binary)
     plt.show()
 
 def main(file_path):
@@ -118,7 +118,7 @@ def main(file_path):
     image_name = os.path.basename(file_path).split(".")[0]
     image = get_image(file_path)
     segmented = create_superpixel(image, image_name)
-    post_processing(segmented,image_name)
+    post_processing(segmented, image_name)
     
 
     
