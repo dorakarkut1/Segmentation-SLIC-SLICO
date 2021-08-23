@@ -8,5 +8,9 @@ segmentation will be saved in the prepared DATA folder. Script SLICO.py is simil
 
 If you want to compare your result to mask prepared by specialist you can use METRICS.py. It should be run from the command line by giving the path to the source image and mask. It returns Dice and Jaccard coefficient. 
 
+For some images you may need to adjust parameters in SLIC.py/ SLICO.py marked as THIS_ONE:
+- cut_threshold(labels, rag, THIS_ONE) in create_superpixel function 
+- cv2.threshold(Image, THIS_ONE, 255, cv2.THRESH_BINARY) in post_processing function 
+
 Packages used in scripts: OpenCV , Numpy , Matplotlib  and Scikit - image. The required Python version is at least 3.7.
 
